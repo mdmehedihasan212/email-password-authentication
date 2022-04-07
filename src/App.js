@@ -3,7 +3,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button';
 import { useState } from 'react';
-import { createUserWithEmailAndPassword, getAuth } from "firebase/auth";
+import { createUserWithEmailAndPassword, getAuth, sendEmailVerification } from "firebase/auth";
 import app from './firebase.init';
 
 const auth = getAuth(app);
@@ -46,10 +46,18 @@ function App() {
         const user = result.user;
         console.log(user);
         setError('');
+        verifyEmail();
       })
       .catch(error => {
         setError(error.message)
         console.error(error.message);
+      })
+  }
+
+  const verifyEmail = () => {
+    sendEmailVerification(auth.currentUser)
+      .then(() => {
+        console.log('Verify email sent');
       })
   }
 
