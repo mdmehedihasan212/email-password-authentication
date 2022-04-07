@@ -3,7 +3,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button';
 import { useState } from 'react';
-import { createUserWithEmailAndPassword, getAuth, sendEmailVerification, signInWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, getAuth, sendEmailVerification, sendPasswordResetEmail, signInWithEmailAndPassword } from "firebase/auth";
 import app from './firebase.init';
 
 const auth = getAuth(app);
@@ -29,7 +29,7 @@ function App() {
 
   const handleToCheck = (event) => {
     setRegistered(event.target.checked)
-    console.log(event.target.checked);
+    // console.log(event.target.checked);
   }
 
   const handleSubmit = (event) => {
@@ -49,6 +49,7 @@ function App() {
         })
         .catch(error => {
           setError(error.message)
+          console.error(error.message);
         })
     }
     else {
@@ -74,15 +75,26 @@ function App() {
       })
   }
 
+  const ForgetPassword = () => {
+    sendPasswordResetEmail(auth, email)
+      .then(() => {
+        console.log('Password reset email sent');
+      })
+      .catch(error => {
+        setError(error.message)
+      })
+  }
+
   return (
     <div>
       <div className="registration w-50 mx-auto mt-5">
         <Form onSubmit={handleSubmit}>
           <h1 className='text-primary'>Please {registered ? 'Login' : 'Registered'}!!</h1>
-          <Form.Group className="mb-3" controlId="formBasicName">
+
+          {!registered && <Form.Group className="mb-3" controlId="formBasicName">
             <Form.Label>Your Name</Form.Label>
             <Form.Control required onBlur={handleToName} type="text" placeholder="Enter Name" />
-          </Form.Group>
+          </Form.Group>}
 
           <Form.Group className="mb-3" controlId="formBasicEmail">
             <Form.Label>Email address</Form.Label>
@@ -99,6 +111,8 @@ function App() {
           <Form.Group className="mb-3" controlId="formBasicCheckbox">
             <Form.Check onChange={handleToCheck} type="checkbox" label="Already Registered" />
           </Form.Group>
+          {registered && <Button onClick={ForgetPassword} variant="link">Forget Password
+          </Button>}
           <p className='text-danger'>{error}</p>
           <Button variant="primary" type="submit">
             {registered ? 'Login' : 'Registered'}
